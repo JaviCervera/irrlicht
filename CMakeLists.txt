@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 3.0)
 project(irrlicht)
 
 #Options
-option(USE_SDL "Use SDL platform" OFF)
+option(SDL_ENABLED "Use SDL platform" OFF)
+set(SDL_PATH "SDL" CACHE PATH "Path to SDL folder (must contain include and lib subfolders)")
 
 #Define file groups
 file(GLOB COMMON_FILES "source/Irrlicht/*.cpp" "source/Irrlicht/aesGladman/*.cpp" "source/Irrlicht/bzip2/*.c" "source/Irrlicht/jpeglib/*.c" "source/Irrlicht/libpng/*.c" "source/Irrlicht/lzma/*.c" "source/Irrlicht/zlib/*.c")
@@ -13,11 +14,11 @@ file(GLOB MAC_FILES "source/Irrlicht/MacOSX/*.mm")
 
 #Add header and lib directories
 include_directories(${INCLUDE_DIRECTORIES} ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/zlib)
-if (USE_SDL)
-	include_directories(${INCLUDE_DIRECTORIES} ${CMAKE_CURRENT_SOURCE_DIR}/SDL/include)
-	link_directories(${LINK_DIRECTORIES} ${CMAKE_CURRENT_SOURCE_DIR}/SDL/lib)
+if (SDL_ENABLED)
+	include_directories(${INCLUDE_DIRECTORIES} ${SDL_PATH}/include)
+	link_directories(${LINK_DIRECTORIES} ${SDL_PATH}/lib)
 	add_definitions(-D_IRR_COMPILE_WITH_SDL_DEVICE_ -DNO_IRR_COMPILE_WITH_WINDOWS_DEVICE_ -DNO_IRR_COMPILE_WITH_OSX_DEVICE_ -DNO_IRR_COMPILE_WITH_X11_DEVICE_)
-endif (USE_SDL)
+endif (SDL_ENABLED)
 
 #Add executable targets
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -41,9 +42,9 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fno-exceptions")
 	set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "-s -static")
 	target_link_libraries(irrlicht_dll -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lwinmm -lopengl32 ${TARGET_LINK_LIBRARIES})
-	if (USE_SDL)
+	if (SDL_ENABLED)
 		target_link_libraries(irrlicht_dll -lSDL.dll ${TARGET_LINK_LIBRARIES})
-	endif (USE_SDL)
+	endif (SDL_ENABLED)
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	message("Platform is macOS")
 	set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} "-s")
